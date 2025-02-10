@@ -15,48 +15,64 @@
       flex-direction: column;
       min-height: 100vh;
     }
-    /* Grid Container */
+    /* A container to center content and constrain maximum width */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Responsive Grid:
+       Using auto-fit with a minmax value keeps each cell (dot container) at a fixed size.
+       The grid gaps and center alignment ensure even spacing on any screen. */
     #grid {
       display: grid;
-      grid-template-columns: repeat(20, 1fr);
-      grid-gap: 8px;
-      padding: 16px;
-      flex-grow: 1;
+      grid-template-columns: repeat(auto-fit, minmax(14px, 14px));
+      gap: 8px;
+      justify-content: center;
     }
-    /* Dot Style */
+    /* Dot Style:
+       Fixed dimensions keep dots consistent; aspect ratio and border-radius make circles.
+       A drop shadow adds depth, and a smooth transition helps with interactive toggling. */
     .dot {
-      width: 100%;
-      aspect-ratio: 1;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
-      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
       transition: background-color 0.2s;
       cursor: pointer;
     }
-    /* Footer Style */
+    /* Footer Style:
+       A padded, flex container with text shadows for an elegant look. */
     .footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px;
       background: #111;
+      padding: 16px;
       font-size: 16px;
       font-family: monospace;
       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+      margin-top: 16px;
+      border-radius: 4px;
     }
   </style>
 </head>
 <body>
-  <!-- Grid of Dots -->
-  <div id="grid"></div>
-  
-  <!-- Footer with Year and Countdown -->
-  <div class="footer">
-    <div id="year"></div>
-    <div id="countdown"></div>
+  <div class="container">
+    <!-- Grid of Dots -->
+    <div id="grid"></div>
+    <!-- Footer with Year and Countdown -->
+    <div class="footer">
+      <div id="year"></div>
+      <div id="countdown"></div>
+    </div>
   </div>
-  
+
   <script>
-    // Determine if a year is a leap year.
+    // Determine whether a given year is a leap year.
     function isLeapYear(year) {
       return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
     }
@@ -70,40 +86,35 @@
       const totalDays = isLeapYear(year) ? 366 : 365;
       const daysLeft = totalDays - dayOfYear;
 
-      // Update footer labels.
+      // Update footer elements.
       document.getElementById("year").textContent = year;
       document.getElementById("countdown").textContent = daysLeft + " days left";
 
-      // Generate the grid.
+      // Generate dots for each day.
       const grid = document.getElementById("grid");
       grid.innerHTML = ""; // Clear any existing content.
-
       for (let i = 1; i <= totalDays; i++) {
         const dot = document.createElement("div");
         dot.className = "dot";
-        
-        // Set the dot's base color: past (and current) days in white; future days in dim gray.
-        let originalColor = (i <= dayOfYear) ? "#FFFFFF" : "#555555";
+        // Set dot color: past and current days are white, future days are dim gray.
+        const originalColor = i <= dayOfYear ? "#FFFFFF" : "#555555";
         dot.style.backgroundColor = originalColor;
         dot.dataset.originalColor = originalColor;
-        
-        // Toggle special state (blue) on click.
+
+        // Toggle to blue on click (and revert on a second click).
         dot.addEventListener("click", function() {
-          if (
-            dot.style.backgroundColor === "blue" ||
-            dot.style.backgroundColor === "rgb(0, 0, 255)"
-          ) {
+          if (dot.style.backgroundColor === "blue" ||
+              dot.style.backgroundColor === "rgb(0, 0, 255)") {
             dot.style.backgroundColor = dot.dataset.originalColor;
           } else {
             dot.style.backgroundColor = "blue";
           }
         });
-        
         grid.appendChild(dot);
       }
     }
 
-    // Generate the grid when the page loads.
+    // Build the grid when the page loads.
     window.addEventListener("load", generateGrid);
   </script>
 </body>
